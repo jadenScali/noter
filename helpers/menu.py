@@ -13,5 +13,5 @@ def main():
     print("5. Edit classes")
     print("6. Quit")
 
-    get_int(lowest_valid=1, highest_valid=6, prompt="")
+    return get_int(lowest_valid=1, highest_valid=6, prompt="")
 
