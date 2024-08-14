@@ -1,0 +1,7 @@
+# Ignore files
+rick_proper.wav
+.venv/
+modules/whisper.cpp/
+
+# Ignore IDE files
+.idea/
