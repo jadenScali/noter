@@ -1,7 +1,8 @@
 # Ignore files
-rick_proper.wav
 .venv/
 modules/whisper.cpp/
+.env
+samples/
 
 # Ignore IDE files
 .idea/

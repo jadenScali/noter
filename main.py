@@ -1,7 +1,8 @@
-from helpers.transcribe import transcribe_audio
-from helpers.file_handler import write_to_file, create_folder, create_class_folders, get_course_codes
+from helpers.process_audio import transcribe_audio
+from helpers.file_handler import create_folder, create_class_folders, get_course_codes
 import helpers.menu as menu
-import time
+from helpers.input_safety import get_path
+from helpers.process_audio import transcribe_and_summarize
 
 
 def main():
@@ -10,6 +11,7 @@ def main():
 
     :return: None
     """
+
     course_codes = []
 
     # If the notes folder didn't exist create it and populate it with classes
@@ -26,7 +28,12 @@ def main():
         case 1:
             print("Record now")
         case 2:
-            print("2")
+            current_class = menu.choose_class(course_codes=course_codes)
+
+            # Gets the path of the audio to be processed
+            wav_path = get_path(prompt="Please enter the path of your .wav file relative to this program: ")
+
+            transcribe_and_summarize(wav_path=wav_path, course_code=current_class)
         case 3:
             print("3")
         case 4:
@@ -35,18 +42,6 @@ def main():
             print("5")
         case 6:
             print("quit")
-
-    # start_time = time.time()
-    #
-    # transcript_raw = transcribe_audio(wav_file="rick_proper.wav")
-    #
-    # end_time = time.time()
-    # elapsed_time = end_time - start_time
-    #
-    # print("Transcription Result:", transcript_raw)
-    # print(f"Time taken: {elapsed_time:.2f} seconds")
-    #
-    # write_to_file(filename="test.txt", content=transcript_raw)
 
 
 main()
