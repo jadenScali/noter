@@ -2,7 +2,10 @@ import os
 import subprocess
 import time
 from datetime import datetime
-from helpers.file_handler import write_to_file, get_lecture_num, move_and_rename_file, txt_file_to_str
+from helpers.file_handler import (
+    write_to_file, move_and_rename_file, txt_file_to_str, get_cut_path, get_wav_file_length, add_time_to_timestamps,
+    get_transcript_end_time
+)
 from helpers.input_safety import remove_timestamps, snake_to_title
 from helpers.openai_handler import summary_sheet_gpt
 
@@ -64,11 +67,11 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
     return processed_str
 
 
-def transcribe_to_file(wav_path, course_code, lecture_num, finalize_transcription=True):
+def transcribe_to_file(course_code, lecture_num, finalize_transcription=True, cut_path_n=0):
     """
     Transcribes a .wav file to a .txt file
 
-    :param str wav_path: The path of the audio file
+    :param int cut_path_n: The nth cut
     :param str course_code: Code of the lecture class
     :param int lecture_num: The nth lecture
     :param bool finalize_transcription: Weather or not to create the other transcript files and add a header
@@ -76,7 +79,17 @@ def transcribe_to_file(wav_path, course_code, lecture_num, finalize_transcriptio
     :return: None
     """
     print("Transcribing...")
-    transcript_raw = transcribe_audio(wav_path=wav_path)
+    wav_path = get_cut_path(current_class=course_code, lecture_num=lecture_num, n=cut_path_n)
+    transcript_raw = transcribe_audio(wav_path=wav_path) + "\n"
+
+    # If a previous cut exists adjust the timestamps on this cut to adjust for that
+    previous_transcript = txt_file_to_str(f"notes/{course_code}/timestamped/{lecture_num}.txt")
+    if previous_transcript is not None:
+        previous_cut_duration = get_transcript_end_time(transcript_raw=previous_transcript)
+        transcript_raw = add_time_to_timestamps(
+            timestamped_transcript=transcript_raw,
+            time_to_add=previous_cut_duration
+        )
 
     # Writes transcript with timestamps to a timestamped .txt file
     transcript_file_name = f"{lecture_num}.txt"

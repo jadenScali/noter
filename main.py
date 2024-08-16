@@ -1,5 +1,11 @@
 from helpers.file_handler import (
-    create_folder, create_class_folders, get_course_codes, txt_file_to_str, get_lecture_num, get_cut_path
+    create_folder,
+    create_class_folders,
+    get_course_codes,
+    txt_file_to_str,
+    get_lecture_num,
+    get_cut_path,
+    merge_cut_audio_files
 )
 import helpers.menu as menu
 from helpers.input_safety import get_path, get_filename, get_positive_number, remove_timestamps
@@ -75,9 +81,10 @@ def record_now(course_codes):
 
                 # Transcribe audio up to this point
                 transcribe_to_file(
-                    wav_path=get_cut_path(current_class=current_class, lecture_num=lecture_num, n=i),
-                    course_code=current_class, lecture_num=lecture_num,
-                    finalize_transcription=False
+                    course_code=current_class,
+                    lecture_num=lecture_num,
+                    finalize_transcription=False,
+                    cut_path_n=i-1,
                 )
 
             case "s":
@@ -86,13 +93,14 @@ def record_now(course_codes):
 
                 # Transcribe the remaining audio
                 transcribe_to_file(
-                    wav_path=get_cut_path(current_class=current_class, lecture_num=lecture_num, n=i),
                     course_code=current_class,
                     lecture_num=lecture_num,
-                    finalize_transcription=True
+                    finalize_transcription=True,
+                    cut_path_n=i
                 )
 
                 # Merge all cut .wav files into one .wav file
+                merge_cut_audio_files(course_code=current_class, lecture_num=lecture_num)
 
                 # Create a summary sheet
                 transcript_path = f"notes/{current_class}/transcripts/{lecture_num}.txt"
@@ -124,7 +132,6 @@ def transcribe_from_recording(course_codes):
     # Transcribes the file
     lecture_num = get_lecture_num(current_class)
     transcribe_to_file(
-        wav_path=wav_path,
         course_code=current_class,
         lecture_num=lecture_num,
         finalize_transcription=True

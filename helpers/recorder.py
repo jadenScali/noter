@@ -1,27 +1,59 @@
 import sounddevice as sd
 import wave
 import threading
+import os
+from pydub import AudioSegment
+
+
+def get_supported_sample_rate():
+    """
+    Returns the supported sample rate for the user's default microphone.
+
+    :return: Supported sample rate int
+    """
+    device_info = sd.query_devices(kind='input')
+
+    return int(sd.query_devices(device_info['index'], 'input')['default_samplerate'])
 
 
 class Recorder:
     """
     A class to handle audio recording from the microphone to a .wav file at a samplerate Whisper can read.
     """
-    def __init__(self, file_path, channels=1, samplerate=16000):
+    def __init__(self, file_path, channels=1):
         """
         Initializes the Recorder with the given file_path, channels, and sample rate.
 
         :param str file_path: The name of the output .wav file
         :param int, optional channels: The channels, defaults to 1 as that's what Whisper supports
-        :param int, optional samplerate: The samplerate of the audio, defaults to 16000 as that's what Whisper supports
 
         :return: None
         """
         self.file_path = file_path
         self.channels = channels
-        self.samplerate = samplerate
+        self.samplerate = get_supported_sample_rate()
+        self.block_size = self.get_optimal_block_size(self.samplerate)
         self.is_recording = False
         self._stream = None
+
+    def get_optimal_block_size(self, samplerate):
+        """
+        Returns an optimal block size for the given sample rate.
+
+        :param int samplerate: The sample rate of the audio
+
+        :return: Optimal block size int
+        """
+        block_sizes = [256, 512, 1024, 2048]
+        for size in block_sizes:
+            try:
+                with sd.InputStream(samplerate=samplerate, channels=self.channels, blocksize=size):
+                    return size
+            except Exception as e:
+                print(f"Block size {size} failed: {e}")
+
+        # Fallback to a default value
+        return 1024
 
 
     def _callback(self, indata, frames, time, status):
@@ -58,7 +90,9 @@ class Recorder:
         self._stream = sd.InputStream(
             samplerate=self.samplerate,
             channels=self.channels,
-            callback=self._callback
+            callback=self._callback,
+            blocksize=self.block_size,
+            dtype = 'int16'
         )
 
 
@@ -74,6 +108,22 @@ class Recorder:
         print(f"Recording live... Saving to {self.file_path}")
 
 
+    def convert_to_16khz(self):
+        """
+        Converts the recorded .wav file to a 16 kHz sample rate.
+
+        :return: None
+        """
+        audio = AudioSegment.from_wav(self.file_path)
+
+        # Resample to 16 kHz
+        if audio.frame_rate != 16000:
+            audio = audio.set_frame_rate(16000)
+
+        # Save the resampled audio back to the file
+        audio.export(self.file_path, format="wav")
+
+
     def stop_recording(self):
         """
         Stops recording audio and finalizes the .wav file.
@@ -85,5 +135,6 @@ class Recorder:
         # Wait for the recording thread to finish
         self._recording_thread.join()
         self._wav_file.close()
+        self.convert_to_16khz()
         print("Recording stopped")
 

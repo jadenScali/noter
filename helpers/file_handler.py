@@ -1,6 +1,10 @@
 import os
 import shutil
+import wave
+import re
+from pydub import AudioSegment
 from helpers.input_safety import get_int, get_filename
+from datetime import timedelta
 
 
 def write_to_file(file_path, content):
@@ -161,9 +165,152 @@ def txt_file_to_str(file_path):
 
     :param str file_path: Path to the .txt file
 
-    :return: String of the content
+    :return: String of the content of None if file doesn't exist
     """
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-    return content
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        return content
+    except FileNotFoundError:
+        return None
 
+
+def merge_cut_audio_files(course_code, lecture_num):
+    """
+    Merges all files matching the pattern {lecture_num}-_-CUT_{n}-_-.wav into a single {lecture_num}.wav file.
+
+    :param str course_code: Code of the lecture class
+    :param number lecture_num: The nth lecture
+
+    :return: None
+    """
+    # Define the regex pattern to match {i}-_-CUT_{n}-_-.wav files
+    pattern = re.compile(rf'^{lecture_num}-_-CUT_(\d+)-_-.wav$')
+
+    # Dictionary to hold cut .wav files
+    files_to_merge = []
+
+    # Iterate over files in the directory
+    directory = f"notes/{course_code}/lectures"
+    for filename in os.listdir(directory):
+        match = pattern.match(filename)
+        if match:
+            cut_number = int(match.group(1))
+            files_to_merge.append((cut_number, filename))
+
+    # Check if there are files to merge
+    if files_to_merge:
+        # Sort the files by the cut number (n)
+        files_to_merge.sort(key=lambda x: x[0])
+
+        # Load and concatenate audio files
+        combined = AudioSegment.empty()
+        for _, filename in files_to_merge:
+            file_path = os.path.join(directory, filename)
+            audio = AudioSegment.from_wav(file_path)
+            combined += audio
+
+        # Export the combined audio to a single file
+        output_path = os.path.join(directory, f"{lecture_num}.wav")
+        combined.export(output_path, format="wav")
+        print(f"Merged files into {output_path}")
+
+        # Delete the original cut files
+        for _, filename in files_to_merge:
+            file_path = os.path.join(directory, filename)
+            os.remove(file_path)
+    else:
+        print(f"No files found for base file number {lecture_num}")
+
+
+def get_wav_file_length(wav_path):
+    """
+    Checks if a .wav file exists and returns its length in seconds.
+
+    :param str wav_path: The path to the .wav file
+
+    :return:  Returns duration in float seconds or None if the file does not exist
+    """
+    if os.path.exists(wav_path) and wav_path.endswith('.wav'):
+        with wave.open(wav_path, 'rb') as wav_file:
+            frames = wav_file.getnframes()
+            rate = wav_file.getframerate()
+            duration = frames / float(rate)
+            return duration
+    else:
+        print(f"The file {wav_path} does not exist or is not a .wav file.")
+        return None
+
+
+def add_time_to_timestamps(timestamped_transcript, time_to_add):
+    """
+    Adds a constant amount of time to all timestamps in the format [hh:mm:ss.sss --> hh:mm:ss.sss] within a str.
+
+    :param str timestamped_transcript: The input string containing the timestamps and dialogue
+    :param float time_to_add: The amount of time in seconds to add to each timestamp
+
+    :return: The modified string with updated timestamps
+    :rtype: str
+    """
+    # Regular expression pattern to match timestamps [hh:mm:ss.sss --> hh:mm:ss.sss]
+    pattern = r'\[(\d{2}):(\d{2}):(\d{2}\.\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}\.\d{3})\]'
+
+    def add_time(match):
+        """
+        Adds time to the matched timestamp and returns the new timestamp.
+
+        :param re.Match match: The matched timestamp
+
+        :return: Updated timestamp string
+        """
+        # Parse start time
+        start_hour, start_minute, start_second = int(match.group(1)), int(match.group(2)), float(match.group(3))
+        start_time = timedelta(hours=start_hour, minutes=start_minute, seconds=start_second)
+
+        # Parse end time
+        end_hour, end_minute, end_second = int(match.group(4)), int(match.group(5)), float(match.group(6))
+        end_time = timedelta(hours=end_hour, minutes=end_minute, seconds=end_second)
+
+        # Add time to both start and end times
+        new_start_time = start_time + timedelta(seconds=time_to_add)
+        new_end_time = end_time + timedelta(seconds=time_to_add)
+
+        # Format the new times back to [hh:mm:ss.sss]
+        new_start_str = f"{str(int(new_start_time.total_seconds() // 3600)).zfill(2)}:" \
+                        f"{str(int((new_start_time.total_seconds() % 3600) // 60)).zfill(2)}:" \
+                        f"{'{:06.3f}'.format(new_start_time.total_seconds() % 60)}"
+
+        new_end_str = f"{str(int(new_end_time.total_seconds() // 3600)).zfill(2)}:" \
+                      f"{str(int((new_end_time.total_seconds() % 3600) // 60)).zfill(2)}:" \
+                      f"{'{:06.3f}'.format(new_end_time.total_seconds() % 60)}"
+
+        return f"[{new_start_str} --> {new_end_str}]"
+
+    # Replace the timestamps in the text
+    modified_text = re.sub(pattern, add_time, timestamped_transcript)
+
+    return modified_text
+
+
+def get_transcript_end_time(transcript_raw):
+    """
+    Extracts the latest end time from a timestamped transcript.
+
+    :param str transcript_raw: The input string containing the timestamps and dialogue.
+
+    :return: The latest end time as a timedelta.
+    """
+    pattern = r'\[(\d{2}):(\d{2}):(\d{2}\.\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}\.\d{3})\]'
+
+    latest_end_time = timedelta()
+
+    for match in re.finditer(pattern, transcript_raw):
+        # Parse end time
+        end_hour, end_minute, end_second = int(match.group(4)), int(match.group(5)), float(match.group(6))
+        end_time = timedelta(hours=end_hour, minutes=end_minute, seconds=end_second)
+
+        # Update the latest end time if this one is later
+        if end_time > latest_end_time:
+            latest_end_time = end_time
+
+    return latest_end_time.total_seconds()
