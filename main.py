@@ -1,7 +1,7 @@
 from helpers.file_handler import create_folder, create_class_folders, get_course_codes, txt_file_to_str, get_lecture_num
 import helpers.menu as menu
-from helpers.input_safety import get_path, get_filename, get_positive_number
-from helpers.process_audio import transcribe_and_summarize, summarize_lecture
+from helpers.input_safety import get_path, get_filename, get_positive_number, remove_timestamps
+from helpers.process_audio import transcribe_to_file, move_wav_to_lectures, summarize_lecture
 from helpers.recorder import Recorder
 
 def main():
@@ -30,13 +30,36 @@ def main():
             mic = Recorder(file_path=f"notes/{current_class}/lectures/{get_lecture_num(course_code=current_class)}.wav")
             mic.start_recording()
 
+            while True:
+
+                # Gets users choice from recording menu
+                user_input = menu.manage_live_recording()
+                match user_input:
+
+                    # Cut recording and transcribe
+                    case "c":
+                        # Transcribe
+                        print("temp")
+
         case 2:
             current_class = menu.choose_class(course_codes=course_codes)
 
             # Gets the path of the audio to be processed
             wav_path = get_path(prompt="Path of your .wav file relative to this program: ")
 
-            transcribe_and_summarize(wav_path=wav_path, course_code=current_class)
+            # Transcribes the file
+            lecture_num = get_lecture_num(current_class)
+            transcribe_to_file(wav_path=wav_path, course_code=current_class, lecture_num=lecture_num,
+                               finalize_transcription=True)
+
+            # Moves the .wav file to lectures
+            move_wav_to_lectures(original_path=wav_path, course_code=current_class, current_lecture_num=lecture_num)
+
+            # Creates a summary sheet
+            transcript_path = f"notes/{current_class}/transcripts/{lecture_num}.txt"
+            transcript_clean_no_header = remove_timestamps(transcript=txt_file_to_str(file_path=transcript_path))
+            summarize_lecture(transcript=transcript_clean_no_header, course_code=current_class,
+                              lecture_num=lecture_num)
         case 3:
             transcript_path = get_path(prompt="Transcript path relative to this program: ")
             course_code = get_filename(prompt="Course code: ")

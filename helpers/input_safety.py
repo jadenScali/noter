@@ -30,7 +30,8 @@ def get_positive_number(prompt):
     """
     Error traps a positive number from the user
 
-    :param str prompt: Prompt to ask users
+    :param str prompt: The message shown to the user before taking input
+
     :return: Positive number either decimal or whole or 0
     """
     while True:
@@ -48,6 +49,27 @@ def get_positive_number(prompt):
                 print("The number must be 0 or greater. Please try again.")
         except ValueError:
             print("Invalid input. Please enter a valid number.")
+
+
+def get_char(valid_chars, prompt):
+    """
+    Error traps a valid char from the user
+
+    :param str prompt: The message shown to the user before taking input
+    :param str valid_chars: A string of all valid chars
+
+    :return: Valid string char
+    """
+    while True:
+        char = input(prompt)
+
+        if len(char) != 1:
+            print("Invalid input. Please enter just one character.")
+        elif char not in valid_chars:
+            print("Invalid input. Please enter only a valid character.")
+        else:
+            return char
+
 
 def get_filename(prompt):
     """
@@ -69,7 +91,8 @@ def get_filename(prompt):
 
 def get_path(prompt):
     """
-    Error traps a valid file path from the user.
+    Error traps a valid path from the user that exists.
+    If a file is included in the path ensures the file exists otherwise ensures the directory exists.
 
     :param str prompt: The message shown to the user before taking input
 
@@ -81,11 +104,11 @@ def get_path(prompt):
         # Check for valid characters in the file path using a regular expression
         if re.match(r'^[\w\-. /\\:]+$', path):
 
-            # Ensure that the path is a valid existing directory or can be created
-            if os.path.exists(os.path.dirname(path)) or os.path.dirname(path) == '':
+            # Ensure that the path is either an existing file or directory
+            if os.path.isfile(path) or os.path.isdir(path):
                 return path
             else:
-                print("The directory does not exist. Please provide a valid path.")
+                print("The specified path does not exist. Please provide a valid file or directory path.")
         else:
             print("Invalid path. Please use letters, numbers, underscores, hyphens, periods, spaces, and valid path "
                   "separators (/, \\).")

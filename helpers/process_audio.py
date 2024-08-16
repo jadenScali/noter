@@ -2,7 +2,7 @@ import os
 import subprocess
 import time
 from datetime import datetime
-from helpers.file_handler import write_to_file, get_lecture_num, move_and_rename_file
+from helpers.file_handler import write_to_file, get_lecture_num, move_and_rename_file, txt_file_to_str
 from helpers.input_safety import remove_timestamps, snake_to_title
 from helpers.openai_handler import summary_sheet_gpt
 
@@ -64,34 +64,53 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
     return processed_str
 
 
-def transcribe_and_summarize(wav_path, course_code):
+def transcribe_to_file(wav_path, course_code, lecture_num, finalize_transcription=True):
     """
+    Transcribes a .wav file to a .txt file
 
-    :param wav_path:
-    :param course_code:
-    :return:
+    :param str wav_path: The path of the audio file
+    :param str course_code: Code of the lecture class
+    :param int lecture_num: The nth lecture
+    :param bool finalize_transcription: Weather or not to create the other transcript files and add a header
+
+    :return: None
     """
-    # Transcribing... animation
     print("Transcribing...")
     transcript_raw = transcribe_audio(wav_path=wav_path)
 
-    current_lecture_num = get_lecture_num(course_code=course_code)
+    # Writes transcript with timestamps to a timestamped .txt file
+    transcript_file_name = f"{lecture_num}.txt"
+    timestamped_path = f"notes/{course_code}/timestamped/{transcript_file_name}"
+    write_to_file(file_path=timestamped_path, content=transcript_raw)
+    print(f"Appended {transcript_file_name} in {timestamped_path}")
 
+    if finalize_transcription:
+        finish_transcription_to_file(course_code=course_code,lecture_num=lecture_num)
+
+
+def finish_transcription_to_file(course_code, lecture_num):
+    """
+    Creates a header for the original timestamped file, creates a non-timestamped file,
+    appends to their respective main.txt
+
+    :param str course_code: Code of the lecture class
+    :param int lecture_num: The nth lecture
+
+    :return: None
+    """
     # Get the current date and time
     current_date = datetime.now()
 
     # Format the date as dd/mm/yyyy
     formatted_date = current_date.strftime("%d/%m/%Y")
 
-    # Adds a header to the transcript and a blank line at the end of the file
-    transcript_header = f"Course: {course_code}\nLecture {current_lecture_num}\nDate: {formatted_date}\n\n"
-    transcript_timestamped = transcript_header + transcript_raw + '\n'
+    # Gets the current transcript file contents
+    transcript_file_name = f"{lecture_num}.txt"
+    transcript_from_file = txt_file_to_str(f"notes/{course_code}/timestamped/{transcript_file_name}")
 
-    # Writes transcript with timestamps to a timestamped .txt file
-    transcript_file_name = f"{current_lecture_num}.txt"
-    timestamped_path = f"notes/{course_code}/timestamped/{transcript_file_name}"
-    write_to_file(file_path=timestamped_path, content=transcript_timestamped)
-    print(f"Created {transcript_file_name} in {timestamped_path}")
+    # Adds a header to the transcript and a blank line at the end of the file
+    transcript_header = f"Course: {course_code}\nLecture {lecture_num}\nDate: {formatted_date}\n\n"
+    transcript_timestamped = transcript_header + transcript_from_file + '\n'
 
     # Appends timestamped transcript to the main timestamped transcript for the class including past lectures
     timestamped_main_path = f"notes/{course_code}/timestamped/main.txt"
@@ -111,17 +130,24 @@ def transcribe_and_summarize(wav_path, course_code):
     write_to_file(file_path=transcript_path_main_path, content=clean_transcript)
     print(f"Appended to main.txt in {transcript_path_main_path}")
 
+    print("\nTranscription successful!")
+
+
+def move_wav_to_lectures(original_path, course_code, current_lecture_num):
+    """
+    Moves .wav file from any location to its proper organized location within /notes/CLASS101/lectures.
+
+    :param str original_path: Original path of the .wav file
+    :param str course_code: Code of the lecture class
+    :param int current_lecture_num: Current lecture number
+
+    :return: None
+    """
     # Moving .wav file to lectures folder
     new_directory = f"notes/{course_code}/lectures"
     new_wav_name = f"{current_lecture_num}.wav"
-    move_and_rename_file(original_path=wav_path, new_directory=new_directory, new_filename=new_wav_name)
-    print(f"Moved {wav_path} to {new_directory} as {new_wav_name}")
-
-    # Creates summary sheet
-    transcript_clean_no_header = remove_timestamps(transcript=transcript_raw)
-    summarize_lecture(transcript=transcript_clean_no_header, course_code=course_code, lecture_num=current_lecture_num)
-
-    print("\nTranscription successful!")
+    move_and_rename_file(original_path=original_path, new_directory=new_directory, new_filename=new_wav_name)
+    print(f"Moved {original_path} to {new_directory} as {new_wav_name}")
 
 
 def summarize_lecture(transcript, course_code, lecture_num):

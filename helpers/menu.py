@@ -1,4 +1,4 @@
-from helpers.input_safety import get_int
+from helpers.input_safety import get_int, get_char
 
 
 def main():
@@ -35,5 +35,19 @@ def choose_class(course_codes):
 
     # Return the name of the course
     return course_codes[choice - 1]
+
+
+def manage_live_recording():
+    """
+
+    :return:
+    """
+    print("c - to transcribe the recording till this point (does not stop recording)")
+    print("s - to stop recording")
+    choice = get_char(valid_chars="sc", prompt="")
+
+    return choice
+
+
 
 
