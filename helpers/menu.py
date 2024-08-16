@@ -7,10 +7,10 @@ def main():
 
     :return: Menu choice int
     """
-    print("\n1. Record now")
+    print("1. Record now")
     print("2. Transcribe from recording")
     print("3. Summarize from transcript")
-    print("4. View transcripts/summaries/lecture recordings")
+    print("4. View summaries/transcripts/lecture recordings")
     print("5. Edit classes")
     print("6. Quit")
 
@@ -39,8 +39,9 @@ def choose_class(course_codes):
 
 def manage_live_recording():
     """
+    Get user to select menu option for live recording.
 
-    :return:
+    :return: User's str (single character) choice
     """
     print("c - to transcribe the recording till this point (does not stop recording)")
     print("s - to stop recording")
@@ -49,5 +50,24 @@ def manage_live_recording():
     return choice
 
 
+def select_media_type():
+    """
+    Get user to select a media type from our available files.
 
+    :return: The folder name str of user's choice
+    """
+    print("Select media type:")
+    print("1. Summary Sheet")
+    print("2. Transcript")
+    print("3. Lecture Recordings")
+
+    choice = get_int(lowest_valid=1, highest_valid=3, prompt="")
+
+    match choice:
+        case 1:
+            return "summaries"
+        case 2:
+            return "transcripts"
+        case 3:
+            return "lectures"
 

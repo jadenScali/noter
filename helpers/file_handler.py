@@ -1,10 +1,10 @@
 import os
 import shutil
-import wave
 import re
 from pydub import AudioSegment
 from helpers.input_safety import get_int, get_filename
 from datetime import timedelta
+from natsort import natsorted
 
 
 def write_to_file(file_path, content):
@@ -182,7 +182,7 @@ def merge_cut_audio_files(course_code, lecture_num):
     :param str course_code: Code of the lecture class
     :param number lecture_num: The nth lecture
 
-    :return: None
+    :return: Output path str or None if no files exist
     """
     # Define the regex pattern to match {i}-_-CUT_{n}-_-.wav files
     pattern = re.compile(rf'^{lecture_num}-_-CUT_(\d+)-_-.wav$')
@@ -219,26 +219,10 @@ def merge_cut_audio_files(course_code, lecture_num):
         for _, filename in files_to_merge:
             file_path = os.path.join(directory, filename)
             os.remove(file_path)
+
+        return output_path
     else:
         print(f"No files found for base file number {lecture_num}")
-
-
-def get_wav_file_length(wav_path):
-    """
-    Checks if a .wav file exists and returns its length in seconds.
-
-    :param str wav_path: The path to the .wav file
-
-    :return:  Returns duration in float seconds or None if the file does not exist
-    """
-    if os.path.exists(wav_path) and wav_path.endswith('.wav'):
-        with wave.open(wav_path, 'rb') as wav_file:
-            frames = wav_file.getnframes()
-            rate = wav_file.getframerate()
-            duration = frames / float(rate)
-            return duration
-    else:
-        print(f"The file {wav_path} does not exist or is not a .wav file.")
         return None
 
 
@@ -314,3 +298,91 @@ def get_transcript_end_time(transcript_raw):
             latest_end_time = end_time
 
     return latest_end_time.total_seconds()
+
+
+def rename_wav_file(original_path, new_name):
+    """
+    Renames a .wav file to a new name while keeping the same directory.
+
+    :param str original_path: The full path to the original .wav file
+    :param str new_name: The new name for the .wav file (without the extension)
+
+    :return: The new str path to the renamed .wav file
+    """
+    # Ensure the file is a .wav file
+    if not original_path.lower().endswith(".wav"):
+        raise ValueError("The provided file is not a .wav file.")
+
+    # Get the directory of the original file
+    directory = os.path.dirname(original_path)
+
+    # Create the new file path with the new name
+    new_path = os.path.join(directory, f"{new_name}.wav")
+
+    # Rename the file
+    os.rename(original_path, new_path)
+
+    return new_path
+
+
+def compress_wav_to_mp3(wav_file_path, bit_rate="192k"):
+    """
+    Compresses a .wav file by converting it to a .mp3 file, prints the percentage of compression,
+    and then deletes the original .wav file.
+
+    :param str wav_file_path: Path to the .wav file
+    :param str bit_rate: Bit-rate for the .mp3 file (default is 192k)
+
+    :return: Path str to the compressed .mp3 file
+    """
+    # Ensure the file is a .wav file
+    if not wav_file_path.lower().endswith(".wav"):
+        raise ValueError("The provided file is not a .wav file.")
+
+    # Get the size of the original .wav file
+    original_size = os.path.getsize(wav_file_path)
+
+    # Load the .wav file
+    audio = AudioSegment.from_wav(wav_file_path)
+
+    # Define the output .mp3 file path
+    mp3_file_path = wav_file_path.replace(".wav", ".mp3")
+
+    # Export the audio as an .mp3 file
+    audio.export(mp3_file_path, format="mp3", bitrate=bit_rate)
+
+    # Get the size of the compressed .mp3 file
+    compressed_size = os.path.getsize(mp3_file_path)
+
+    # Calculate the percentage of compression
+    compression_percentage = ((original_size - compressed_size) / original_size) * 100
+
+    # Print the percentage of compression
+    print(f"Compression to .mp3 saved {compression_percentage:.2f}% space")
+
+    # Delete the original .wav file
+    os.remove(wav_file_path)
+
+    return mp3_file_path
+
+
+def get_files_in_directory(directory_path):
+    """
+    Returns a list of filenames within the given directory.
+
+    :param str directory_path: The path to the directory
+
+    :return: A list[str] of filenames in the directory
+    """
+    # Check if the provided path is a valid directory
+    if not os.path.isdir(directory_path):
+        raise ValueError(f"The provided path '{directory_path}' is not a valid directory.")
+
+    # Get the list of filenames in the directory
+    filenames = os.listdir(directory_path)
+
+    # Sort the filenames naturally ie numbers in increasing order and then alphabetically
+    filenames = natsorted(filenames)
+
+    return filenames
+

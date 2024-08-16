@@ -3,8 +3,13 @@ import subprocess
 import time
 from datetime import datetime
 from helpers.file_handler import (
-    write_to_file, move_and_rename_file, txt_file_to_str, get_cut_path, get_wav_file_length, add_time_to_timestamps,
-    get_transcript_end_time
+    write_to_file,
+    move_and_rename_file,
+    txt_file_to_str,
+    get_cut_path,
+    add_time_to_timestamps,
+    get_transcript_end_time,
+    compress_wav_to_mp3
 )
 from helpers.input_safety import remove_timestamps, snake_to_title
 from helpers.openai_handler import summary_sheet_gpt
@@ -147,20 +152,23 @@ def finish_transcription_to_file(course_code, lecture_num):
 
 
 def move_wav_to_lectures(original_path, course_code, current_lecture_num):
-    """
-    Moves .wav file from any location to its proper organized location within /notes/CLASS101/lectures.
+    f"""
+    Moves .wav file from any location to its proper organized location within 
+    /notes/CLASS101/lectures/{current_lecture_num}-_-CUT_0-_-.wav. to simulate it being a cut like in record_now().
 
     :param str original_path: Original path of the .wav file
     :param str course_code: Code of the lecture class
     :param int current_lecture_num: Current lecture number
 
-    :return: None
+    :return: Path str moved to
     """
     # Moving .wav file to lectures folder
     new_directory = f"notes/{course_code}/lectures"
-    new_wav_name = f"{current_lecture_num}.wav"
+    new_wav_name = f"{current_lecture_num}-_-CUT_0-_-.wav"
     move_and_rename_file(original_path=original_path, new_directory=new_directory, new_filename=new_wav_name)
     print(f"Moved {original_path} to {new_directory} as {new_wav_name}")
+
+    return f"{new_directory}/{new_wav_name}"
 
 
 def summarize_lecture(transcript, course_code, lecture_num):
