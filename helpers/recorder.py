@@ -24,12 +24,14 @@ class Recorder:
         self._stream = None
 
 
-    def _callback(self, indata, status):
+    def _callback(self, indata, frames, time, status):
         """
         Internal callback function to handle real-time audio data.
 
         This function is called automatically by the sounddevice.InputStream
         to process and save the incoming audio data to the .wav file.
+
+        Note: Frames and time are side effects of InputStream callback and not used
 
         :param numpy.ndarray indata: Raw audio data captured from the mic as a chunk
         :param sounddevice.CallbackFlags status: Status flags indicating the state of the stream (e.g., errors)

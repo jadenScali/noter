@@ -1,7 +1,6 @@
 import re
 import os
 
-
 def get_int(lowest_valid, highest_valid, prompt):
     """
     Error traps an int between a range from the user.

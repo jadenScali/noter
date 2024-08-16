@@ -119,6 +119,19 @@ def get_lecture_num(course_code):
         return 0
 
 
+def get_cut_path(current_class, lecture_num, n):
+    """
+    Generates the path of the cut .wav file
+
+    :param lecture_num:
+    :param str current_class: Class code
+    :param int n: The nth cut .wav file
+
+    :return: The path of the cut .wav file
+    """
+    return f"notes/{current_class}/lectures/{lecture_num}-_-CUT_{n}-_-.wav"
+
+
 def move_and_rename_file(original_path, new_directory, new_filename):
     """
     Moves a file and renames it
