@@ -199,8 +199,8 @@ def summary_sheet_gpt(transcript):
 
     sheet_title = ask_gpt(
         system_prompt=("Your a student that needs to write a brief one or two word title for a summary sheet in "
-                       "snake_case. Something that represents the text. The user will provide you with the "
-                       "summary sheet"),
+                       "snake_case. Make it specific to the topic covered in the sheet. The user will provide you with "
+                       "the summary sheet"),
         user_prompt=summary_sheet
     )
 
