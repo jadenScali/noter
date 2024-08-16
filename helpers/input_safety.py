@@ -4,7 +4,7 @@ import os
 
 def get_int(lowest_valid, highest_valid, prompt):
     """
-    Error traps an int between a range from the user
+    Error traps an int between a range from the user.
 
     :param int lowest_valid: The lowest int that would be valid
     :param int highest_valid: The highest int that would be valid
@@ -25,6 +25,29 @@ def get_int(lowest_valid, highest_valid, prompt):
         except ValueError:
             print(f"Invalid input! Please enter a number")
 
+
+def get_positive_number(prompt):
+    """
+    Error traps a positive number from the user
+
+    :param str prompt: Prompt to ask users
+    :return: Positive number either decimal or whole or 0
+    """
+    while True:
+        try:
+            # Get input from the user
+            user_input = input(prompt)
+
+            # Convert the input to a float (can handle both integers and decimals)
+            number = float(user_input)
+
+            # Check if the number is 0 or greater
+            if number >= 0:
+                return number
+            else:
+                print("The number must be 0 or greater. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a valid number.")
 
 def get_filename(prompt):
     """
@@ -83,4 +106,20 @@ def remove_timestamps(transcript):
     cleaned_text = re.sub(timestamp_pattern, '', transcript)
 
     return cleaned_text
+
+def snake_to_title(snake_str):
+    """
+    Converts a snake_case word to Title Case
+
+    :param str snake_str: A snake_case string
+
+    :return: Title Case string
+    """
+    # Replace underscores with spaces
+    title_str = snake_str.replace('_', ' ')
+
+    # Capitalize the first letter and make the rest lowercase
+    title_str = title_str.title()
+
+    return title_str
 

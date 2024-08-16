@@ -141,3 +141,16 @@ def move_and_rename_file(original_path, new_directory, new_filename):
 
     return new_path
 
+
+def txt_file_to_str(file_path):
+    """
+    Converts the content of a .txt file to a string.
+
+    :param str file_path: Path to the .txt file
+
+    :return: String of the content
+    """
+    with open(file_path, 'r', encoding='utf-8') as file:
+        content = file.read()
+    return content
+

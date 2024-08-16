@@ -3,7 +3,7 @@ import subprocess
 import time
 from datetime import datetime
 from helpers.file_handler import write_to_file, get_lecture_num, move_and_rename_file
-from helpers.input_safety import remove_timestamps
+from helpers.input_safety import remove_timestamps, snake_to_title
 from helpers.openai_handler import summary_sheet_gpt
 
 
@@ -117,22 +117,44 @@ def transcribe_and_summarize(wav_path, course_code):
     move_and_rename_file(original_path=wav_path, new_directory=new_directory, new_filename=new_wav_name)
     print(f"Moved {wav_path} to {new_directory} as {new_wav_name}")
 
-    # Creates a summary sheet and its title based on the transcript
+    # Creates summary sheet
     transcript_clean_no_header = remove_timestamps(transcript=transcript_raw)
+    summarize_lecture(transcript=transcript_clean_no_header, course_code=course_code, lecture_num=current_lecture_num)
+
+    print("\nTranscription successful!")
+
+
+def summarize_lecture(transcript, course_code, lecture_num):
+    """
+    Summarizes the lecture from a transcript and creates a .md summary sheet
+
+    :param str transcript: Lecture transcript
+    :param str course_code: Code of the lecture class
+    :param number lecture_num: The nth lecture
+
+    :return: Creates the summary sheet file
+    """
+    # Creates a summary sheet and its title based on the transcript
     print("Summarizing...")
-    summary_sheet, sheet_title = summary_sheet_gpt(transcript=transcript_clean_no_header)
+    summary_sheet, sheet_title = summary_sheet_gpt(transcript=transcript)
+
+    # Get the current date and time
+    current_date = datetime.now()
+
+    # Format the date as dd/mm/yyyy
+    formatted_date = current_date.strftime("%d/%m/%Y")
 
     # Add header to summary_sheet in Markdown
     sheet_header = (
-        f"## {sheet_title}\n\n"
-        f"### Lecture: {course_code}-{current_lecture_num}\n"
+        f"## {snake_to_title(sheet_title)}\n\n"
+        f"### Lecture: {course_code}-{lecture_num}\n"
         f"### Date: {formatted_date}\n\n"
         f"---\n\n"
     )
     summary_sheet = sheet_header + summary_sheet + "\n\n"
 
     # Writes summary_sheet to a .md (Markdown) file
-    summary_file_name = f"{current_lecture_num}.md"
+    summary_file_name = f"{lecture_num}-{sheet_title.lower()}.md"
     summary_path = f"notes/{course_code}/summaries/{summary_file_name}"
     write_to_file(file_path=summary_path, content=summary_sheet)
     print(f"Created {summary_file_name} in {summary_path}")
@@ -140,5 +162,5 @@ def transcribe_and_summarize(wav_path, course_code):
     # Appends summary_sheet to the main summary_sheet for the class including past lectures
     summary_main_path = f"notes/{course_code}/summaries/main.md"
     write_to_file(file_path=summary_main_path, content=summary_sheet)
-    print(f"Appended to main.md in {timestamped_main_path}")
+    print(f"Appended to main.md in {summary_main_path}")
 
