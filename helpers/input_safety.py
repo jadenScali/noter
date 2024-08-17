@@ -1,12 +1,13 @@
 import re
 import os
 
-def get_int(lowest_valid, highest_valid, prompt):
+
+def get_int(prompt, lowest_valid=None, highest_valid=None):
     """
     Error traps an int between a range from the user.
 
-    :param int lowest_valid: The lowest int that would be valid
-    :param int highest_valid: The highest int that would be valid
+    :param int lowest_valid: The lowest int that would be valid if None no lower bound
+    :param int highest_valid: The highest int that would be valid if None no upper bound
     :param str prompt: The message shown to the user before taking input
 
     :return: User chosen int
@@ -16,8 +17,15 @@ def get_int(lowest_valid, highest_valid, prompt):
             num = int(input(prompt))
 
             # Check if int is in the valid range
-            if num < lowest_valid or num > highest_valid:
-                print(f"Please enter a number between {lowest_valid} and {highest_valid}")
+            # The upper and lower bounds are ignored if they are none
+            if (lowest_valid and num < lowest_valid) or (highest_valid and num > highest_valid):
+                if lowest_valid and highest_valid:
+                    print(f"Please enter a number between {lowest_valid} and {highest_valid}")
+                if not lowest_valid:
+                    print(f"Please enter a number less than or equal to {highest_valid}")
+                if not highest_valid:
+                    print(f"Please enter a number greater than or equal to {lowest_valid}")
+
                 continue
 
             return num
@@ -74,7 +82,7 @@ def get_filename(prompt):
     """
     Error traps a valid filename from the user
 
-    :param prompt: The message shown to the user before taking input
+    :param str prompt: The message shown to the user before taking input
 
     :return: Valid filename string
     """
@@ -117,7 +125,8 @@ def remove_timestamps(transcript):
     """
     Takes a transcript with timestamps and removes them
 
-    :param transcript: The transcript with timestamps
+    :param str transcript: The transcript with timestamps
+
     :return: The str transcript without the timestamps
     """
 
@@ -144,4 +153,22 @@ def snake_to_title(snake_str):
     title_str = title_str.title()
 
     return title_str
+
+
+def select_course_code(valid_course_codes, prompt):
+    """
+    Gets the user to select a course code form a set of valid course codes
+
+    :param str prompt: The message shown to the user before taking input
+    :param List[str] valid_course_codes: A list of valid course codes
+
+    :return: Course code selected by user
+    """
+    while True:
+        course_code = input(prompt)
+
+        if course_code in valid_course_codes:
+            return course_code
+        else:
+            print("Invalid course code. Please select a course code which is already added.")
 

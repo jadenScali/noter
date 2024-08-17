@@ -152,7 +152,7 @@ def finish_transcription_to_file(course_code, lecture_num):
 
 
 def move_wav_to_lectures(original_path, course_code, current_lecture_num):
-    f"""
+    """
     Moves .wav file from any location to its proper organized location within 
     /notes/CLASS101/lectures/{current_lecture_num}-_-CUT_0-_-.wav. to simulate it being a cut like in record_now().
 

@@ -16,13 +16,15 @@ def main():
 
     return get_int(lowest_valid=1, highest_valid=6, prompt="")
 
-def choose_class(course_codes):
+def choose_class(course_codes, archived_codes=None):
     """
     Get user to select the class they want to use
 
+    :param List[str] archived_codes: A list of archived users courses
     :param List[str] course_codes: A list of all the users classes
 
     :return: Course code str
+    :return: Weather or not its archived as a bool
     """
     print("Select class:")
 
@@ -30,11 +32,28 @@ def choose_class(course_codes):
     for i, course in enumerate(course_codes):
         print(f"{i + 1}. {course}")
 
+    highest_valid = len(course_codes)
+
+    # Optionally gives the option to view archived classes
+    if archived_codes:
+        highest_valid += 1
+        print(f"{highest_valid}. Archived classes")
+
     # User selected the number they see beside their current course
-    choice = get_int(lowest_valid=1, highest_valid=len(course_codes), prompt="")
+    choice = get_int(lowest_valid=1, highest_valid=highest_valid, prompt="")
+
+    # Choose archived classes
+    if choice == highest_valid and archived_codes:
+
+        # Prints all archived courses as options
+        for i, course in enumerate(archived_codes):
+            print(f"{i + 1}. {course}")
+            class_choice = get_int(lowest_valid=1, highest_valid=len(archived_codes), prompt="")
+
+            return archived_codes[class_choice - 1], True
 
     # Return the name of the course
-    return course_codes[choice - 1]
+    return course_codes[choice - 1], False
 
 
 def manage_live_recording():
@@ -70,4 +89,29 @@ def select_media_type():
             return "transcripts"
         case 3:
             return "lectures"
+
+
+def edit_class_options():
+    """
+    Get user to select the type of edit type wish to make.
+
+    :return: The type of edit
+    """
+    print("Select option:")
+    print("1. Archive classes")
+    print("2. Add new classes")
+    print("3. New semester (archive all current classes and add new classes)")
+    print("4. Restore from archive")
+
+    choice = get_int(lowest_valid=1, highest_valid=4, prompt="")
+
+    match choice:
+        case 1:
+            return "archive"
+        case 2:
+            return "add_classes"
+        case 3:
+            return "new_semester"
+        case 4:
+            return "restore_from_archive"
 

@@ -21,14 +21,16 @@ def write_to_file(file_path, content):
         file.write(content)
 
 
-def create_class_folders():
+def create_class_folders(prompt):
     """
     Creates the folders and subfolders for each class only if they do not already exist.
     Each class will get a transcripts, summaries and timestamped folder.
 
+    :param str prompt: The message shown to the user before taking input
+
     :return: List[str] class names user entered
     """
-    class_count = get_int(lowest_valid=1, highest_valid=100, prompt="How many classes do you have this semester?\n")
+    class_count = get_int(lowest_valid=1, prompt=prompt)
     course_codes = []
 
     # Saves the class names to course_codes and create appropriate files
@@ -62,24 +64,29 @@ def create_folder(path):
     return False
 
 
-def get_course_codes():
+def get_course_codes(root_directory, ignore_directories=None):
     """
-    Returns a list of folder names in the notes folder.
+    Returns a list of folder names in the root directory.
+
+    :param List[str] ignore_directories: A list of folders to ignore
+    :param str root_directory: The directory to search
 
     :return: List[str] of folder names aka course_codes
     """
 
+    if ignore_directories is None:
+        ignore_directories = [f"{root_directory}/archived_classes"]
+
     folder_names = []
-    notes_path = "notes"
 
     # Iterate through the entries in the notes folder
-    for entry in os.listdir(notes_path):
+    for entry in os.listdir(root_directory):
 
         # Create the full path for each entry
-        full_path = os.path.join(notes_path, entry)
+        full_path = os.path.join(root_directory, entry)
 
         # Check if the entry is a directory
-        if os.path.isdir(full_path):
+        if os.path.isdir(full_path) and full_path not in ignore_directories:
             folder_names.append(entry)
 
     return folder_names
@@ -385,4 +392,32 @@ def get_files_in_directory(directory_path):
     filenames = natsorted(filenames)
 
     return filenames
+
+
+def move_directory(original_path, new_path):
+    """
+    Moves a directory to a new location.
+
+    :param str original_path: The original directory path
+    :param str new_path: The new str directory path
+
+    :return: New path to folder
+    """
+    # Ensure the parent directory exists, create it if it doesn't
+    parent_directory = os.path.dirname(new_path)
+    if not os.path.exists(parent_directory):
+        os.makedirs(parent_directory)
+
+    # If the new directory already exists, add a suffix to the filename
+    suffix = 1
+    base_path = new_path
+
+    while os.path.exists(new_path):
+        suffix += 1
+        new_path = f"{base_path}_{suffix}"
+
+    # Move the directory
+    shutil.move(original_path, new_path)
+
+    return new_path
 
