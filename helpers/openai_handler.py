@@ -15,7 +15,7 @@ def ask_gpt(system_prompt, user_prompt):
     :param str system_prompt: Used to give instructions of the task
     :param str user_prompt: Used to give context for the task
 
-    :return: Response from gpt4-o as a str
+    :return str: Response from gpt4-o
     """
     completion = client.chat.completions.create(
         model="gpt-4o",
@@ -40,8 +40,8 @@ def summary_sheet_gpt(transcript):
 
     :param str transcript: Transcript of a lecture
 
-    :return: A str (.md compatible) summary sheet
-    :return: A str title for the summary sheet
+    :return str: A (.md compatible) summary sheet
+    :return str: A title for the summary sheet
     """
 
     note_template = """

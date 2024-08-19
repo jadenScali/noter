@@ -3,9 +3,9 @@ from helpers.input_safety import get_int, get_char
 
 def main():
     """
-    Renders the main menu for the user and returns a clean user choice
+    Renders the main menu for the user and returns a clean user choice.
 
-    :return: Menu choice int
+    :return int: Menu choice
     """
     print("1. Record now")
     print("2. Transcribe from recording")
@@ -16,17 +16,18 @@ def main():
 
     return get_int(lowest_valid=1, highest_valid=6, prompt="")
 
+
 def choose_class(course_codes, archived_codes=None):
     """
-    Get user to select the class they want to use
+    Get user to select the class they want to use.
 
     :param List[str] archived_codes: A list of archived users courses
     :param List[str] course_codes: A list of all the users classes
 
-    :return: Course code str
-    :return: Weather or not its archived as a bool
+    :return str: Course code
+    :return bool: Weather or not its archived
     """
-    print("Select class:")
+    print("\nSelect class:")
 
     # Prints all courses as options
     for i, course in enumerate(course_codes):
@@ -44,6 +45,7 @@ def choose_class(course_codes, archived_codes=None):
 
     # Choose archived classes
     if choice == highest_valid and archived_codes:
+        print("\nSelect an archived class:")
 
         # Prints all archived courses as options
         for i, course in enumerate(archived_codes):
@@ -60,9 +62,9 @@ def manage_live_recording():
     """
     Get user to select menu option for live recording.
 
-    :return: User's str (single character) choice
+    :return str: User's (single character) choice
     """
-    print("c - to transcribe the recording till this point (does not stop recording)")
+    print("\nc - to transcribe the recording till this point (does not stop recording)")
     print("s - to stop recording")
     choice = get_char(valid_chars="sc", prompt="")
 
@@ -73,9 +75,9 @@ def select_media_type():
     """
     Get user to select a media type from our available files.
 
-    :return: The folder name str of user's choice
+    :return str: The folder name of user's choice
     """
-    print("Select media type:")
+    print("\nSelect media type:")
     print("1. Summary Sheet")
     print("2. Transcript")
     print("3. Lecture Recordings")
@@ -95,9 +97,9 @@ def edit_class_options():
     """
     Get user to select the type of edit type wish to make.
 
-    :return: The type of edit
+    :return str: The type of edit
     """
-    print("Select option:")
+    print("\nSelect option:")
     print("1. Archive classes")
     print("2. Add new classes")
     print("3. New semester (archive all current classes and add new classes)")

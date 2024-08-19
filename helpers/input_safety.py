@@ -10,7 +10,7 @@ def get_int(prompt, lowest_valid=None, highest_valid=None):
     :param int highest_valid: The highest int that would be valid if None no upper bound
     :param str prompt: The message shown to the user before taking input
 
-    :return: User chosen int
+    :return int: The number the user chose
     """
     while True:
         try:
@@ -20,7 +20,10 @@ def get_int(prompt, lowest_valid=None, highest_valid=None):
             # The upper and lower bounds are ignored if they are none
             if (lowest_valid and num < lowest_valid) or (highest_valid and num > highest_valid):
                 if lowest_valid and highest_valid:
-                    print(f"Please enter a number between {lowest_valid} and {highest_valid}")
+                    if lowest_valid == highest_valid:
+                        print(f"Please enter {lowest_valid} as it is the only valid option")
+                    else:
+                        print(f"Please enter a number between {lowest_valid} and {highest_valid}")
                 if not lowest_valid:
                     print(f"Please enter a number less than or equal to {highest_valid}")
                 if not highest_valid:
@@ -35,14 +38,15 @@ def get_int(prompt, lowest_valid=None, highest_valid=None):
 
 def get_positive_number(prompt):
     """
-    Error traps a positive number from the user
+    Error traps a positive number from the user.
 
     :param str prompt: The message shown to the user before taking input
 
-    :return: Positive number either decimal or whole or 0
+    :return float: Positive number either decimal or whole or 0
     """
     while True:
         try:
+
             # Get input from the user
             user_input = input(prompt)
 
@@ -53,19 +57,19 @@ def get_positive_number(prompt):
             if number >= 0:
                 return number
             else:
-                print("The number must be 0 or greater. Please try again.")
+                print("The number must be 0 or greater. Please try again.\n")
         except ValueError:
-            print("Invalid input. Please enter a valid number.")
+            print("Invalid input. Please enter a valid number.\n")
 
 
 def get_char(valid_chars, prompt):
     """
-    Error traps a valid char from the user
+    Error traps a valid char from the user.
 
     :param str prompt: The message shown to the user before taking input
     :param str valid_chars: A string of all valid chars
 
-    :return: Valid string char
+    :return str: Valid char chosen by the user
     """
     while True:
         char = input(prompt)
@@ -84,7 +88,7 @@ def get_filename(prompt):
 
     :param str prompt: The message shown to the user before taking input
 
-    :return: Valid filename string
+    :return str: Valid filename
     """
     while True:
         filename = input(prompt)
@@ -93,7 +97,7 @@ def get_filename(prompt):
         if re.match(r'^[\w\-. ]+$', filename):
             return filename
         else:
-            print("Invalid name. Please use letters, numbers, underscores, hyphens, periods, and spaces only.")
+            print("Invalid name. Please use letters, numbers, underscores, hyphens, periods, and spaces only.\n")
 
 
 def get_path(prompt):
@@ -103,7 +107,7 @@ def get_path(prompt):
 
     :param str prompt: The message shown to the user before taking input
 
-    :return: Valid file path string
+    :return str: Valid file path
     """
     while True:
         path = input(prompt)
@@ -123,11 +127,11 @@ def get_path(prompt):
 
 def remove_timestamps(transcript):
     """
-    Takes a transcript with timestamps and removes them
+    Takes a transcript with timestamps and removes them.
 
     :param str transcript: The transcript with timestamps
 
-    :return: The str transcript without the timestamps
+    :return str: The transcript without the timestamps
     """
 
     # Define the regex pattern for the timestamp
@@ -140,12 +144,13 @@ def remove_timestamps(transcript):
 
 def snake_to_title(snake_str):
     """
-    Converts a snake_case word to Title Case
+    Converts a snake_case word to Title Case.
 
     :param str snake_str: A snake_case string
 
-    :return: Title Case string
+    :return str: Title Case string
     """
+
     # Replace underscores with spaces
     title_str = snake_str.replace('_', ' ')
 
@@ -162,7 +167,7 @@ def select_course_code(valid_course_codes, prompt):
     :param str prompt: The message shown to the user before taking input
     :param List[str] valid_course_codes: A list of valid course codes
 
-    :return: Course code selected by user
+    :return str: Course code selected by user
     """
     while True:
         course_code = input(prompt)
@@ -170,5 +175,5 @@ def select_course_code(valid_course_codes, prompt):
         if course_code in valid_course_codes:
             return course_code
         else:
-            print("Invalid course code. Please select a course code which is already added.")
+            print("Invalid course code. Please select a course code which is already added.\n")
 

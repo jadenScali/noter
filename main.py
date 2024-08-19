@@ -13,16 +13,20 @@ from helpers.file_handler import (
     compress_wav_to_mp3,
     rename_wav_file,
     get_files_in_directory,
-    move_directory
+    move_directory,
+    convert_to_wav_16khz
 )
 from helpers.input_safety import (
-    get_path, get_filename,
+    get_path,
     get_positive_number,
-    remove_timestamps, get_int,
+    remove_timestamps,
+    get_int,
     select_course_code
 )
 from helpers.process_audio import transcribe_to_file, move_wav_to_lectures, summarize_lecture
 from helpers.recorder import Recorder
+from helpers.fancy_prints import print_title, print_yellow, print_green
+
 
 def main():
     """
@@ -30,6 +34,7 @@ def main():
 
     :return: None
     """
+    print_title()
     course_codes = []
     archived_course_codes = []
 
@@ -38,6 +43,13 @@ def main():
     if create_folder(note_root_path):
         create_folder(path=f"{note_root_path}/archived_classes")
         course_codes += create_class_folders(prompt="How many classes do you have this semester?\n")
+
+    # If notes folder exists but there are only archived classes
+    elif len(get_course_codes(root_directory="notes")) == 0:
+        course_codes += create_class_folders(prompt="How many classes do you have this semester?\n")
+
+        # Adds a blank line spacer
+        print()
     else:
         course_codes += get_course_codes(root_directory="notes")
         archived_course_codes += get_course_codes(root_directory="notes/archived_classes")
@@ -51,7 +63,7 @@ def main():
         case 2:
             transcribe_from_recording(course_codes=course_codes)
         case 3:
-            summarize_from_transcript()
+            summarize_from_transcript(course_codes=course_codes)
         case 4:
             view_file(course_codes=course_codes, archived_course_codes=archived_course_codes)
         case 5:
@@ -103,6 +115,7 @@ def record_now(course_codes):
                 )
 
             case "s":
+
                 # Stop recording finalize .wav
                 mic.stop_recording()
 
@@ -131,6 +144,8 @@ def record_now(course_codes):
                     lecture_num=lecture_num
                 )
 
+                print(f"You're recording has been transcribed and summarised in notes/{current_class}")
+
                 # Ends loop when user exits
                 return
 
@@ -145,8 +160,36 @@ def transcribe_from_recording(course_codes):
     """
     current_class, _ = menu.choose_class(course_codes=course_codes)
 
-    # Gets the path of the audio to be processed
-    wav_path = get_path(prompt="Path of your .wav file relative to this program: ")
+    while True:
+
+        # Gets the path of the audio to be processed
+        lecture_path = get_path(prompt="\nPath of your audio or video file relative to this program: ")
+        try:
+
+            # Converts the audio or video file to .wav at 16khz
+            wav_path = convert_to_wav_16khz(file_path=lecture_path)
+
+            # Breaks after successful conversion
+            break
+        except Exception as e:
+            supported_file_extensions = [
+                # Audio formats
+                '.mp3', '.wav', '.flac', '.ogg', '.aac',
+                '.m4a', '.wma', '.aiff', '.opus',
+
+                # Video formats
+                '.mp4', '.mkv', '.avi', '.mov',
+                '.wmv', '.flv', '.webm'
+            ]
+
+            # Tells user to use one of the supported file types
+            print_yellow("\nError processing file!")
+            print("Please use one of the following file extensions:", end=" ")
+            for extension in supported_file_extensions:
+                print(extension, end=" ")
+
+            # Adds newline
+            print()
 
     # Moves the .wav file to lectures
     lecture_num = get_lecture_num(current_class)
@@ -160,7 +203,6 @@ def transcribe_from_recording(course_codes):
     )
 
     # Compresses lecture file
-    print("Compressing")
     clean_wav_path = rename_wav_file(original_path=new_path, new_name=f"{lecture_num}")
     compress_wav_to_mp3(wav_file_path=clean_wav_path)
 
@@ -174,14 +216,19 @@ def transcribe_from_recording(course_codes):
     )
 
 
-def summarize_from_transcript():
+def summarize_from_transcript(course_codes):
     """
     Creates a summary sheet based on a transcript
 
+    :param List[str] course_codes: List of valid course codes
+
     :return: None
     """
-    transcript_path = get_path(prompt="Transcript path relative to this program: ")
-    course_code = get_filename(prompt="Course code: ")
+    transcript_path = get_path(prompt="\nTranscript path relative to this program: ")
+    course_code = select_course_code(
+        prompt=f"Course code: ",
+        valid_course_codes=course_codes
+    )
     lecture_num = get_positive_number(prompt="Lecture #: ")
 
     transcript = txt_file_to_str(transcript_path)
@@ -197,6 +244,7 @@ def view_file(course_codes, archived_course_codes):
 
     :return: None
     """
+
     # Get user choices about the media they want to view
     current_class, is_archive = menu.choose_class(course_codes=course_codes, archived_codes=archived_course_codes)
     media_type = menu.select_media_type()
@@ -211,7 +259,8 @@ def view_file(course_codes, archived_course_codes):
         print("There are no files here")
         return
 
-    print(f"Select from {media_type}")
+    # Gets the user to select the file from their specified media type
+    print(f"\nSelect from {media_type}")
     for i, file_name in enumerate(files_in_folder):
         print(f"{i+1}. {file_name}")
 
@@ -239,7 +288,7 @@ def edit_classes(course_codes, archived_course_codes):
     """
     Archive or add courses.
 
-    :param List[str] archived_course_codes: Course codes in the acrhive
+    :param List[str] archived_course_codes: Course codes in the archive
     :param List[str] course_codes: Course codes that are currently not archived
 
     :return: None
@@ -248,8 +297,11 @@ def edit_classes(course_codes, archived_course_codes):
 
     match edit_type:
         case "archive":
-            print("How many classes would you like to archive?")
+            print("\nHow many classes would you like to archive?")
             classes_to_archive = get_int(lowest_valid=1, highest_valid=len(course_codes), prompt="")
+
+            # Adds blank line
+            print()
 
             # For every class to archive archives a different course code
             for i in range(classes_to_archive):
@@ -264,15 +316,17 @@ def edit_classes(course_codes, archived_course_codes):
                     new_path=f"notes/archived_classes/{class_to_archive}"
                 )
 
-            print("Archive successful!")
+            print_green("Archive successful!")
 
         case "add_classes":
-            create_class_folders(prompt="How many classes would you like to add?\n")
-            print("Classes added successfully!")
+            create_class_folders(prompt="\nHow many classes would you like to add?\n")
+            print_green("\nClasses added successfully!")
 
         case "new_semester":
+
             # Archive every class
             for course in course_codes:
+
                 # Moves class folder to archived classes
                 move_directory(
                     original_path=f"notes/{course}",
@@ -281,12 +335,15 @@ def edit_classes(course_codes, archived_course_codes):
 
             print("All classes archived")
 
-            create_class_folders(prompt="How many classes would you like to add?\n")
+            create_class_folders(prompt="\nHow many classes would you like to add?\n")
             print("Classes added successfully!")
 
         case "restore_from_archive":
-            print("How many classes would you like to restore?")
+            print("\nHow many classes would you like to restore?")
             classes_to_restore = get_int(lowest_valid=1, highest_valid=len(archived_course_codes), prompt="")
+
+            # Adds blank line
+            print()
 
             # For every class to archive archives a different course code
             for i in range(classes_to_restore):
@@ -301,7 +358,7 @@ def edit_classes(course_codes, archived_course_codes):
                     new_path=f"notes/{class_to_restore}"
                 )
 
-            print("Restore successful!")
+            print_green("Restore successful!")
 
 
 main()

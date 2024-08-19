@@ -1,15 +1,15 @@
 import sounddevice as sd
 import wave
 import threading
-import os
 from pydub import AudioSegment
+from helpers.fancy_prints import print_red
 
 
 def get_supported_sample_rate():
     """
     Returns the supported sample rate for the user's default microphone.
 
-    :return: Supported sample rate int
+    :return int: Supported sample rate
     """
     device_info = sd.query_devices(kind='input')
 
@@ -25,7 +25,7 @@ class Recorder:
         Initializes the Recorder with the given file_path, channels, and sample rate.
 
         :param str file_path: The name of the output .wav file
-        :param int, optional channels: The channels, defaults to 1 as that's what Whisper supports
+        :param int channels: The channels, defaults to 1 as that's what Whisper supports
 
         :return: None
         """
@@ -36,13 +36,14 @@ class Recorder:
         self.is_recording = False
         self._stream = None
 
+
     def get_optimal_block_size(self, samplerate):
         """
         Returns an optimal block size for the given sample rate.
 
         :param int samplerate: The sample rate of the audio
 
-        :return: Optimal block size int
+        :return int: Optimal block size
         """
         block_sizes = [256, 512, 1024, 2048]
         for size in block_sizes:
@@ -105,7 +106,7 @@ class Recorder:
 
         self._recording_thread = threading.Thread(target=record)
         self._recording_thread.start()
-        print(f"Recording live... Saving to {self.file_path}")
+        print_red(f"\nRecording live...")
 
 
     def convert_to_16khz(self):
@@ -136,5 +137,5 @@ class Recorder:
         self._recording_thread.join()
         self._wav_file.close()
         self.convert_to_16khz()
-        print("Recording stopped")
+        print_red("Recording stopped")
 

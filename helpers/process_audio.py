@@ -2,14 +2,14 @@ import os
 import subprocess
 import time
 from datetime import datetime
+from helpers.fancy_prints import print_green
 from helpers.file_handler import (
     write_to_file,
     move_and_rename_file,
     txt_file_to_str,
     get_cut_path,
     add_time_to_timestamps,
-    get_transcript_end_time,
-    compress_wav_to_mp3
+    get_transcript_end_time
 )
 from helpers.input_safety import remove_timestamps, snake_to_title
 from helpers.openai_handler import summary_sheet_gpt
@@ -23,11 +23,10 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
     :param str model_name: Name of the model to use
     :param str timed: Weather or not to display the time it took to transcribe a file
 
-    :return: Transcribed string of the audio file
+    :return str: The transcript of the audio
 
     :raises: Exception if any error occurs during transcribing
     """
-
     if timed:
         start_time = time.time()
 
@@ -65,16 +64,16 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
         if elapsed_time >= 60:
             minutes = elapsed_time // 60
             seconds = elapsed_time % 60
-            print(f"\nTranscribed in {minutes} minutes and {seconds:.2f} seconds")
+            print(f"Transcribed in {minutes} minutes and {seconds:.2f} seconds")
         else:
-            print(f"\nTranscribed in {elapsed_time:.2f} seconds")
+            print(f"Transcribed in {elapsed_time:.2f} seconds")
 
     return processed_str
 
 
 def transcribe_to_file(course_code, lecture_num, finalize_transcription=True, cut_path_n=0):
     """
-    Transcribes a .wav file to a .txt file
+    Transcribes a .wav file to a .txt file.
 
     :param int cut_path_n: The nth cut
     :param str course_code: Code of the lecture class
@@ -83,7 +82,7 @@ def transcribe_to_file(course_code, lecture_num, finalize_transcription=True, cu
 
     :return: None
     """
-    print("Transcribing...")
+    print_green("\nTranscribing...")
     wav_path = get_cut_path(current_class=course_code, lecture_num=lecture_num, n=cut_path_n)
     transcript_raw = transcribe_audio(wav_path=wav_path) + "\n"
 
@@ -116,6 +115,7 @@ def finish_transcription_to_file(course_code, lecture_num):
 
     :return: None
     """
+
     # Get the current date and time
     current_date = datetime.now()
 
@@ -148,7 +148,7 @@ def finish_transcription_to_file(course_code, lecture_num):
     write_to_file(file_path=transcript_path_main_path, content=clean_transcript)
     print(f"Appended to main.txt in {transcript_path_main_path}")
 
-    print("\nTranscription successful!")
+    print_green("\nTranscription successful!")
 
 
 def move_wav_to_lectures(original_path, course_code, current_lecture_num):
@@ -160,8 +160,9 @@ def move_wav_to_lectures(original_path, course_code, current_lecture_num):
     :param str course_code: Code of the lecture class
     :param int current_lecture_num: Current lecture number
 
-    :return: Path str moved to
+    :return str: New path of audio lecture
     """
+
     # Moving .wav file to lectures folder
     new_directory = f"notes/{course_code}/lectures"
     new_wav_name = f"{current_lecture_num}-_-CUT_0-_-.wav"
@@ -173,16 +174,17 @@ def move_wav_to_lectures(original_path, course_code, current_lecture_num):
 
 def summarize_lecture(transcript, course_code, lecture_num):
     """
-    Summarizes the lecture from a transcript and creates a .md summary sheet
+    Summarizes the lecture from a transcript and creates a .md summary sheet.
 
     :param str transcript: Lecture transcript
     :param str course_code: Code of the lecture class
     :param number lecture_num: The nth lecture
 
-    :return: Creates the summary sheet file
+    :return: None
     """
+
     # Creates a summary sheet and its title based on the transcript
-    print("Summarizing...")
+    print_green("\nSummarizing...")
     summary_sheet, sheet_title = summary_sheet_gpt(transcript=transcript)
 
     # Get the current date and time
@@ -210,4 +212,6 @@ def summarize_lecture(transcript, course_code, lecture_num):
     summary_main_path = f"notes/{course_code}/summaries/main.md"
     write_to_file(file_path=summary_main_path, content=summary_sheet)
     print(f"Appended to main.md in {summary_main_path}")
+
+    print_green("\nSummary sheet successful!")
 
