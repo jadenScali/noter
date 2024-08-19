@@ -8,7 +8,7 @@ def main():
     :return int: Menu choice
     """
     print("1. Record now")
-    print("2. Transcribe from recording")
+    print("2. Transcribe and summarize from recording")
     print("3. Summarize from transcript")
     print("4. View summaries/transcripts/lecture recordings")
     print("5. Edit classes")
