@@ -166,7 +166,8 @@ If you don't already have these installed here's how you can do so!
     pip install -r requirements.txt
     git clone https://github.com/ggerganov/whisper.cpp.git
     cd whisper.cpp
-    cmake medium.en
+    bash ./models/download-ggml-model.sh medium.en
+    ./main -m models/ggml-medium.en.bin -f samples/jfk.wav
     ```
 
    Cleanup folders
