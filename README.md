@@ -139,6 +139,8 @@ If you don't already have these installed here's how you can do so!
 
 1. **Clone the Repository**:
 
+   Open the ```Anaconda Prompt```
+
     Clone in the directory you want this project in!
     ```bash
     git clone https://github.com/jadenScali/noter.git
@@ -149,7 +151,7 @@ If you don't already have these installed here's how you can do so!
     cd noter
     ```
     
-2. **Create and activate a conda Environment (Optional) (Recommended)**:
+3. **Create and activate a conda Environment (Optional) (Recommended)**:
 
    Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly recommend you use `miniconda`.
     ```bash
@@ -157,7 +159,7 @@ If you don't already have these installed here's how you can do so!
     conda activate noter
     ```
 
-3. **Create Whisper (speech to text) model locally**:
+4. **Create Whisper (speech to text) model locally**:
 
    Install requirements and make model
     ```bash
@@ -177,7 +179,7 @@ If you don't already have these installed here's how you can do so!
      rmdir /S /Q whisper.cpp
      ```
 
-4. **Setup AI features using OpenAI**
+5. **Setup AI features using OpenAI**
 
    Create an openAI account and follow these [instructions](https://help.openai.com/en/articles/8867743-assign-api-key-permissions) to generate an API key
 
