@@ -55,49 +55,49 @@ def summary_sheet_gpt(transcript):
     **Term**: Definition of the term.
 
     ---
-    
+
     <!-- OPTIONAL: For every relevant code syntax mentioned in the lecture unlimited -->
     ## Important Code snippets 💾
-    
+
     **For loop**: Iterates over a sequence, such as a list or a range of numbers. 
-    
+
         for item in items:
             print(item)
-    
+
     **SELECT**: A statement in SQL is used to query data from a database.
-        
+
         SELECT name FROM people;
-    
+
     **Bubble sort**: a simple sorting algorithm that repeatedly steps through a list, compares adjacent elements, and swaps them if they are in the wrong order. This process continues until the list is sorted.
-        
+
         def bubble_sort(arr):
         n = len(arr)
-    
+
         # Traverse through all elements in the array
         for i in range(n):
-    
+
             # Track if a swap was made in this pass
             swapped = False
-            
+
             # Last i elements are already sorted, so we can skip them
             for j in range(0, n - i - 1):
-    
+
                 # Compare adjacent elements
                 if arr[j] > arr[j + 1]:
-    
+
                     # Swap if the element found is greater than the next element
                     arr[j], arr[j + 1] = arr[j + 1], arr[j]
                     swapped = True
-            
+
             # If no elements were swapped, the array is already sorted
             if not swapped:
                 break
-    
+
         # Example usage
         arr = [5, 3, 8, 4, 2]
         bubble_sort(arr)
         print("Sorted array:", arr)
-    
+
     ---
 
     <!-- OPTIONAL: For every relevant formula mentioned in the lecture unlimited -->
@@ -190,10 +190,10 @@ def summary_sheet_gpt(transcript):
 
     # Gets the summary and title from gpt
     summary_sheet = ask_gpt(
-        system_prompt=  f"You are a student that writes notes from a lecture based on a transcript. "
-                        f"The user will provide you with the transcript. Make sure you only include things from the "
-                        f"transcript in the summary. "
-                        f"Strictly follow this Markdown template to format the note:\n\n{note_template}",
+        system_prompt=f"You are a student that writes notes from a lecture based on a transcript. "
+                      f"The user will provide you with the transcript. Make sure you only include things from the "
+                      f"transcript in the summary. "
+                      f"Strictly follow this Markdown template to format the note:\n\n{note_template}",
         user_prompt=transcript
     )
 
@@ -203,6 +203,11 @@ def summary_sheet_gpt(transcript):
                        "the summary sheet"),
         user_prompt=summary_sheet
     )
+
+    # Check if the title response contains multiple lines or is longer than 50 characters
+    if '\n' in sheet_title or len(sheet_title) > 50:
+        # Construct the new file path
+        sheet_title = "info"
 
     return summary_sheet, sheet_title
 

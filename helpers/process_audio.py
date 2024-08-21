@@ -1,6 +1,7 @@
 import os
 import subprocess
 import time
+import platform
 from datetime import datetime
 from helpers.fancy_prints import print_green
 from helpers.file_handler import (
@@ -30,7 +31,16 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
     if timed:
         start_time = time.time()
 
-    model = f"modules/whisper.cpp/models/ggml-{model_name}.bin"
+     # Detect the operating system
+    os_name = platform.system()
+
+    # Update the commands for different the OS systems
+    if os_name == "Windows":
+        model = f"whisper\\models\\ggml-{model_name}.bin"
+        full_command = f"whisper\\main.exe -m {model} -f {wav_path} -np"
+    elif os_name == "Linux" or os_name == "Darwin":
+        model = f"whisper/models/ggml-{model_name}.bin"
+        full_command = f"whisper/main -m {model} -f {wav_path} -np"
 
     # Check if the whisper model exists
     if not os.path.exists(model):
@@ -40,8 +50,6 @@ def transcribe_audio(wav_path, model_name="medium.en", timed=True):
     # Check if the wav file exists
     if not os.path.exists(wav_path):
         raise FileNotFoundError(f"WAV file not found: {wav_path}")
-
-    full_command = f"modules/whisper.cpp/main -m {model} -f {wav_path} -np"
 
     # Execute the command
     process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

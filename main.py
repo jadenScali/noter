@@ -44,6 +44,9 @@ def main():
         create_folder(path=f"{note_root_path}/archived_classes")
         course_codes += create_class_folders(prompt="How many classes do you have this semester?\n")
 
+        # Adds a blank line spacer
+        print()
+
     # If notes folder exists but there are only archived classes
     elif len(get_course_codes(root_directory="notes")) == 0:
         course_codes += create_class_folders(prompt="How many classes do you have this semester?\n")
