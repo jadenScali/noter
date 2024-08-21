@@ -1,4 +1,4 @@
-# Noter
+# Noter 👩🏻‍🏫
 
 **Noter** turns lecture audio into detailed summary sheets.
 
@@ -8,8 +8,17 @@
 - **Summarize lectures**: **Noter** uses GPT-4o to create (.md) files with summaries, definitions, and step-by-step examples covered in a lecture. Summary sheets can be created from all modern video or audio formats or a transcript (.txt) file.
 - **Playback lectures**: Relisten to lectures with the (.mp3) files automatically sorted by class code and date.
 
+## Quick Start
+
+First setup repo:
+MacOS users with M1 chip or newer follow [here](#macos-m1-or-later-).
+Windows users follow [here](#windows-)
+
+Then use software:
+Learn how to summarize from transcript [here](#example-usage).
+
 ## Installation
-### macOS (M1 or later)
+### macOS (M1 or later) 🍎
 
 ### Prerequisites 📋
 - **`Git`**
@@ -112,3 +121,87 @@ If you don't already have these installed here's how you can do so!
      ```env
      OPENAI_API_KEY="your_openai_api_key_here"
      ```
+
+### Windows 🪟
+
+### Prerequisites 📋
+- **[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
+- **Python 3.10 ([miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install) reconmended)**
+- **[ffmpeg](https://www.ffmpeg.org/download.html)**
+- **[cmake](https://cmake.org/download/)**
+  
+### Setting up this repo 😇
+
+1. **Clone the Repository**:
+
+    Clone in the directory you want this project in!
+    ```bash
+    git clone https://github.com/jadenScali/noter.git
+    ```
+
+    Move into this project
+    ```bash
+    cd noter
+    ```
+    
+2. **Create and activate a conda Environment (Optional) (Reconmended)**:
+
+   Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly reconmend you use `miniconda`.
+    ```bash
+    conda create -n noter python=3.10
+    conda activate noter
+    ```
+
+3. **Create Whisper (speech to text) model locally**:
+
+   Install requirements and make model
+    ```bash
+    pip install -r requirements.txt
+    git clone https://github.com/ggerganov/whisper.cpp.git
+    cd whisper.cpp
+    cmake medium.en
+    ```
+
+   Cleanup folders
+     ```bash
+     cd ..
+     mkdir whisper\models
+     move whisper.cpp\main.exe whisper\
+     move whisper.cpp\models\ggml-medium.en-encoder.mlmodelc whisper\models\
+     move whisper.cpp\models\ggml-medium.en whisper\models\
+     rmdir /S /Q whisper.cpp
+     ```
+
+4. **Setup AI features using OpenAI**
+
+   Create an openAI account and follow these [instructions](https://help.openai.com/en/articles/8867743-assign-api-key-permissions) to generate an API key
+
+   Create a `.env` file in the root of the project directory:
+     ```bash
+     touch .env
+     ```
+   Open the `.env` file in a text editor and add your OpenAI API key:
+     ```env
+     OPENAI_API_KEY="your_openai_api_key_here"
+     ```
+
+## Example Usage
+
+1. Start program (make sure your conda enviornment is active if you used conda)
+     ```bash
+     python main.py
+     ```
+
+2. Follow the instructions and create your classes
+   
+4. Select 3 (Summarize from transcript)
+
+5. Use the ```samples/cs50_SQL_transcript.txt``` to summarize the sample transcipt
+
+6. Fill out the remaining feilds.
+
+7. Note for ```Lecture #``` you can use decimal numbers espically if you want to create multiple summaries for the same transcript
+
+8. After the summary sheet is created you can check it under the ```summaries``` folder at the path ```notes/COURSE_CODE/summaries```
+
+9. To properly view the .md file use a Markdown viewer in or out of your IDE. If you're using vsCode there r good extentions you should use to properly display the Latex math symbols
