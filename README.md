@@ -10,11 +10,14 @@
 
 ## Quick Start
 
-First setup repo:
+### First setup repo:
+
 MacOS users with M1 chip or newer follow [here](#macos-m1-or-later-).
+
 Windows users follow [here](#windows-)
 
-Then use software:
+### Then use repo example:
+
 Learn how to summarize from transcript [here](#example-usage).
 
 ## Installation
@@ -22,7 +25,7 @@ Learn how to summarize from transcript [here](#example-usage).
 
 ### Prerequisites 📋
 - **`Git`**
-- **Python 3.10 (`miniconda` reconmended)**
+- **Python 3.10 (`miniconda` recommended)**
 - **`ffmpeg`**
 
 If you don't already have these installed here's how you can do so!
@@ -37,7 +40,7 @@ If you don't already have these installed here's how you can do so!
      brew install git
      ```
      
-3. Install `miniconda` (strongly reconmended to avoid python version conflicts)
+3. Install `miniconda` (strongly recommended to avoid python version conflicts)
 
    Download `miniconda`
      ```bash
@@ -71,9 +74,9 @@ If you don't already have these installed here's how you can do so!
     cd noter
     ```
     
-2. **Create and activate a conda Environment (Optional) (Reconmended)**:
+2. **Create and activate a conda Environment (Optional) (Recommended)**:
 
-   Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly reconmend you use `miniconda`.
+   Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly recommend you use `miniconda`.
     ```bash
     conda create -n noter python=3.10
     conda activate noter
@@ -109,6 +112,8 @@ If you don't already have these installed here's how you can do so!
      rm -rf whisper.cpp
      ```
 
+     NOTE: The first time the speech-to-text model is ran it will be slow because it's optimising for your hardware
+
 4. **Setup AI features using OpenAI**
 
    Create an openAI account and follow these [instructions](https://help.openai.com/en/articles/8867743-assign-api-key-permissions) to generate an API key
@@ -126,7 +131,7 @@ If you don't already have these installed here's how you can do so!
 
 ### Prerequisites 📋
 - **[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
-- **Python 3.10 ([miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install) reconmended)**
+- **Python 3.10 ([miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install) recommended)**
 - **[ffmpeg](https://www.ffmpeg.org/download.html)**
 - **[cmake](https://cmake.org/download/)**
   
@@ -144,9 +149,9 @@ If you don't already have these installed here's how you can do so!
     cd noter
     ```
     
-2. **Create and activate a conda Environment (Optional) (Reconmended)**:
+2. **Create and activate a conda Environment (Optional) (Recommended)**:
 
-   Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly reconmend you use `miniconda`.
+   Python 3.10 is required for this project. You may install it manually but it may cause python versioning conflicts. We strongly recommend you use `miniconda`.
     ```bash
     conda create -n noter python=3.10
     conda activate noter
@@ -187,21 +192,21 @@ If you don't already have these installed here's how you can do so!
 
 ## Example Usage
 
-1. Start program (make sure your conda enviornment is active if you used conda)
+1. Start program (make sure your conda environment is active if you used conda)
      ```bash
      python main.py
      ```
 
 2. Follow the instructions and create your classes
    
-4. Select 3 (Summarize from transcript)
+4. Select ```3``` (summarise from transcript)
 
-5. Use the ```samples/cs50_SQL_transcript.txt``` to summarize the sample transcipt
+5. Use the ```samples/cs50_SQL_transcript.txt``` to summarise the sample transcript
 
-6. Fill out the remaining feilds.
+6. Fill out the remaining fields.
 
-7. Note for ```Lecture #``` you can use decimal numbers espically if you want to create multiple summaries for the same transcript
+7. Note for ```Lecture #``` you can use decimal numbers especially if you want to create multiple summaries for the same transcript
 
 8. After the summary sheet is created you can check it under the ```summaries``` folder at the path ```notes/COURSE_CODE/summaries```
 
-9. To properly view the .md file use a Markdown viewer in or out of your IDE. If you're using vsCode there r good extentions you should use to properly display the Latex math symbols
+9. To properly view the .md file use a Markdown viewer in or out of your IDE. If you're using vsCode there are good extensions you should use to properly display the Latex math symbols
