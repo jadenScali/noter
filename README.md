@@ -10,15 +10,15 @@
 
 ## Quick Start
 
-### First setup repo:
+**First setup repo:**
 
-MacOS users with M1 chip or newer follow [here](#macos-m1-or-later-).
+MacOS users with M1 chip or newer follow [here](#macos-m1-or-later-)
 
 Windows users follow [here](#windows-)
 
-### Then use repo example:
+**Then use repo example:**
 
-Learn how to summarize from transcript [here](#example-usage).
+Learn how to summarize from transcript [here](#example-usage)
 
 ## Installation
 ### macOS (M1 or later) 🍎
