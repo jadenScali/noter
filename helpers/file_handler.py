@@ -19,7 +19,7 @@ def write_to_file(file_path, content):
 
     :return: None
     """
-    with open(file_path, 'a') as file:
+    with open(file_path, 'a', encoding='utf-8') as file:
         file.write(content)
 
 
