@@ -166,11 +166,15 @@ If you don't already have these installed here's how you can do so!
     pip install -r requirements.txt
     git clone https://github.com/ggerganov/whisper.cpp.git
     cd whisper.cpp
+    ```
+    
+   Open ```Git Bash``` and navigate to the whisper.cpp directory
+    ```bash
     bash ./models/download-ggml-model.sh medium.en
     ./main -m models/ggml-medium.en.bin -f samples/jfk.wav
     ```
 
-   Cleanup folders
+   Go back to the first ```Anaconda Command Prompt``` and cleanup folders
      ```bash
      cd ..
      mkdir whisper\models
@@ -180,7 +184,7 @@ If you don't already have these installed here's how you can do so!
      rmdir /S /Q whisper.cpp
      ```
 
-5. **Setup AI features using OpenAI**
+6. **Setup AI features using OpenAI**
 
    Create an openAI account and follow these [instructions](https://help.openai.com/en/articles/8867743-assign-api-key-permissions) to generate an API key
 
