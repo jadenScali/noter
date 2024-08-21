@@ -2,7 +2,6 @@
 .venv/
 modules/whisper.cpp/
 .env
-samples/
 
 # Ignore IDE files
 .idea/
