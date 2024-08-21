@@ -165,10 +165,9 @@ If you don't already have these installed here's how you can do so!
     ```bash
     pip install -r requirements.txt
     git clone https://github.com/ggerganov/whisper.cpp.git
-    cd whisper.cpp
     ```
     
-   Open ```Git Bash``` and navigate to the whisper.cpp directory
+   Open ```Git Bash``` and navigate to the whisper.cpp directory ```cd whisper.cpp``` which is within the root project directory
     ```bash
     bash ./models/download-ggml-model.sh medium.en
     ./main -m models/ggml-medium.en.bin -f samples/jfk.wav
@@ -176,7 +175,6 @@ If you don't already have these installed here's how you can do so!
 
    Go back to the first ```Anaconda Command Prompt``` and cleanup folders
      ```bash
-     cd ..
      mkdir whisper\models
      move whisper.cpp\main.exe whisper\
      move whisper.cpp\models\ggml-medium.en-encoder.mlmodelc whisper\models\
