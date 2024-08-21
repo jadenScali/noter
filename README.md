@@ -210,7 +210,7 @@ If you don't already have these installed here's how you can do so!
 
 5. Use the ```samples/cs50_SQL_transcript.txt``` to summarise the sample transcript
 
-6. Fill out the remaining fields.
+6. Fill out the remaining fields
 
 7. Note for ```Lecture #``` you can use decimal numbers especially if you want to create multiple summaries for the same transcript
 
