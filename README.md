@@ -130,7 +130,7 @@ If you don't already have these installed here's how you can do so!
 ### Windows 🪟
 
 ### Prerequisites 📋
-- **[Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)**
+- **[Git](https://git-scm.com/download/win)**
 - **Python 3.10 ([miniconda](https://docs.anaconda.com/miniconda/#quick-command-line-install) recommended)**
 - **[ffmpeg](https://www.ffmpeg.org/download.html)**
 - **[cmake](https://cmake.org/download/)**
