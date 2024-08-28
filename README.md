@@ -108,7 +108,7 @@ If you don't already have these installed here's how you can do so!
      mv whisper.cpp/main whisper/
      mv whisper.cpp/models/coreml-encoder-medium.en.mlpackage whisper/models
      mv whisper.cpp/models/ggml-medium.en-encoder.mlmodelc whisper/models
-     mv whisper.cpp/models/ggml-medium.en whisper/models
+     mv whisper.cpp/models/ggml-medium.en.bin whisper/models
      rm -rf whisper.cpp
      ```
 
