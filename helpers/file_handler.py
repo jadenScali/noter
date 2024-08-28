@@ -430,8 +430,8 @@ def convert_to_wav_16khz(file_path):
     # Export the audio as a .wav file with a 16 kHz sample rate
     audio.set_frame_rate(16000).export(output_file_path, format="wav")
 
-    # Remove the original audio file if it wasn't a video
-    if not is_video:
+    # Remove the original audio file if it wasn't a video or a .wav
+    if not is_video and file_ext != '.wav':
         os.remove(file_path)
     else:
         # Remove the temporary audio file if created
