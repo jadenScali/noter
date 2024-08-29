@@ -20,6 +20,12 @@ Other operating systems are not currently supported!
 
 Learn how to summarize from transcript [here](#example-usage)
 
+## Demo
+
+Press on the thumbnail to watch!
+
+[![Watch the video](https://img.youtube.com/vi/I3-nrNl56tc/0.jpg)](https://www.youtube.com/watch?v=I3-nrNl56tc)
+
 ## Installation
 ### macOS (M1 or later) 🍎
 
